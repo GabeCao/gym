@@ -28,6 +28,3 @@ class Evn:
                 data = line.strip().split(',')
                 hotspot = Hotspot(float(data[0]), float(data[1]), int(data[2]))
                 self.hotspots.append(hotspot)
-if __name__ == '__main__':
-    evn = Evn()
-    print(evn.test())
