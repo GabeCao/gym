@@ -9,6 +9,8 @@ class Evn(object):
         self.n_actions = len(self.actions)
         self.hotspots = []
         self.getAllHotSpots()
+        self.sensors_mobile_charger = {}
+        self.set_sensors_mobile_charger()
 
 
     def getAllActions(self):
@@ -27,6 +29,7 @@ class Evn(object):
         # action 中 选择的hotspot的编号和等待时间
         selected_hotspot_num = int(action_arr[0])
         selected_wait_time = int(action_arr[1])
+
         current_index = 0
         time = 0
         for i in range(1, 500):
@@ -34,9 +37,13 @@ class Evn(object):
             if self.state[i] == 0:
                 current_index = i
                 break
+        # 将action 添加到最后一个
+        self.state[current_index] = selected_hotspot_num + selected_wait_time / 10
         # 当前时刻的hotspot的编号 和 当前时刻所属的时间段
         current_hotspot_num = int(self.state[current_index - 1])
-        current_phase = math.ceil((time*60 + move_time) / 3600)
+        # 从08：00 到现在的总时间 total_time
+        total_time = (time*60 + move_time)
+        current_phase = math.ceil(total_time / 3600)
 
         # 获得选择的hotspot 和 当前时刻的hotspot
         selected_hotspot = self.getHotspotFromHotspotsListByNum(selected_hotspot_num)
@@ -46,6 +53,18 @@ class Evn(object):
         moving_time = distance / 5
         # 将 移动时间累加到 state 的最后一位中
         self.state[-1] += moving_time
+
+        # 选择的hotspot 中 可能到达的 sensor 和 到达的次数
+        selected_hotspot_sensor_times = {}
+        path = 'hotspot/' + str(current_phase) + '时间段/' + str(selected_hotspot_num) + '.txt'
+        with open(path) as file:
+            for line in file:
+                data = line.strip().split(',')
+                if int(data[1]) != 0:
+                    selected_hotspot_sensor_times[data[0]] = int(data[1])
+        for key, value in selected_hotspot_sensor_times.items():
+            for i in range(501, len(self.state)):
+                if int(key) == int(self.state[i]):
 
 
     def reset(self):
@@ -85,3 +104,25 @@ class Evn(object):
         x = p1.get_x() - p2.get_x()
         y = p1.get_y() - p2.get_y()
         return math.sqrt((x ** 2) + (y ** 2))
+
+    def set_sensors_mobile_charger(self):
+        self.sensors_mobile_charger['000'] = [0.7, 0.6]
+        self.sensors_mobile_charger['001'] = [0.3, 0.8]
+        self.sensors_mobile_charger['003'] = [0.9, 1]
+        self.sensors_mobile_charger['004'] = [0.5, 0.5]
+        self.sensors_mobile_charger['015'] = [0.4, 0.6]
+        self.sensors_mobile_charger['030'] = [1, 0.9]
+        self.sensors_mobile_charger['042'] = [0.2, 0.8]
+        self.sensors_mobile_charger['065'] = [1, 1]
+        self.sensors_mobile_charger['081'] = [0.9, 0.7]
+        self.sensors_mobile_charger['082'] = [0.8, 0.5]
+        self.sensors_mobile_charger['085'] = [0.3, 0.7]
+        self.sensors_mobile_charger['096'] = [0.4, 1]
+        self.sensors_mobile_charger['125'] = [0.6, 0.6]
+        self.sensors_mobile_charger['126'] = [0.3, 0.5]
+        self.sensors_mobile_charger['165'] = [0.5, 0.8]
+        self.sensors_mobile_charger['179'] = [0.8, 0.9]
+        self.sensors_mobile_charger['MC'] = [2000, 50]
+
+
+
