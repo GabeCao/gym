@@ -1,35 +1,11 @@
-from Hotspot import Hotspot
-import math
-import os
-
-class Evn:
-    def __init__(self):
-        self.hotspots = []
-        self.getAllHotSpots()
-
-    def getHotspotFromHotspotsListByNum(self, num):
-        for hotspot in self.hotspots:
-            if hotspot.get_num() == num:
-                return hotspot
-
-    def getDistanceBetweenDistance(self, p1, p2):
-        x = p1.get_x() - p2.get_x()
-        y = p1.get_y() - p2.get_y()
-        return math.sqrt((x ** 2) + (y ** 2))
-
-    def test(self):
-        p1 = self.getHotspotFromHotspotsListByNum(2)
-        p2 = self.getHotspotFromHotspotsListByNum(3)
-        return self.getDistanceBetweenDistance(p1, p2)
-
-    def getAllHotSpots(self):
-        path = 'hotspot.txt'
-        with open(path) as file:
-            for line in file:
-                data = line.strip().split(',')
-                hotspot = Hotspot(float(data[0]), float(data[1]), int(data[2]))
-                self.hotspots.append(hotspot)
-
+from datetime import datetime
 if __name__ == '__main__':
-    for i in range(3, 11):
-        print(i)
+    time_str = '21:59:58'
+    time_1 = datetime.strptime(time_str, '%H:%M:%S')
+    time_2 = datetime.strptime('21:59:56', '%H:%M:%S')
+    print(time_1)
+    print(time_2)
+    sec = (time_1 - time_2).seconds
+    if sec < 10:
+        print("a")
+

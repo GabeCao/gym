@@ -1,20 +1,28 @@
 import os
 import math
 from Hotspot import Hotspot
+from datetime import datetime
 class Evn(object):
     def __init__(self):
+        # 所有的action
         self.actions = []
         self.state = []
+        # 给self.actions 赋值
         self.getAllActions()
+        # actions 的大小
         self.n_actions = len(self.actions)
+        # 所有的hotspot 放在这个list里
         self.hotspots = []
+        # 给 self.hotspots 赋值
         self.getAllHotSpots()
+        # 所有的sensor 和 mobile charger = 的初始能量信息 {sensor : [初始能量, 消耗速率]}
         self.sensors_mobile_charger = {}
         self.set_sensors_mobile_charger()
 
 
     def getAllActions(self):
-        with open('C:/E/dataSet/2018-05-29/hotspot.txt', 'r') as file:
+        # 读取hotspot 文件中的信息，放入到self.actions 中
+        with open('hotspot.txt', 'r') as file:
             for line in file:
                 array = line.strip().split(',')
                 a = array[2]
@@ -54,7 +62,19 @@ class Evn(object):
         # 将 移动时间累加到 state 的最后一位中
         self.state[-1] += moving_time
 
-        # 选择的hotspot 中 可能到达的 sensor 和 到达的次数
+        # 选择的hotspot 在MC停留的时间里 到达的 sensor
+        stay_time_seconds = selected_wait_time * 60
+        arravied_sensor = []
+        path = 'C:/E/dataSet/2018-05-29/sensor数据/'
+        files = os.listdir(path)
+        for file in files:
+            sensor_num = file.split('.')[0]
+            with open(path + file) as f:
+                for line in f:
+                    data = line.strip().split(',')
+
+
+
         selected_hotspot_sensor_times = {}
         path = 'hotspot/' + str(current_phase) + '时间段/' + str(selected_hotspot_num) + '.txt'
         with open(path) as file:
@@ -62,6 +82,7 @@ class Evn(object):
                 data = line.strip().split(',')
                 if int(data[1]) != 0:
                     selected_hotspot_sensor_times[data[0]] = int(data[1])
+
         for key, value in selected_hotspot_sensor_times.items():
             for i in range(501, len(self.state)):
                 if int(key) == int(self.state[i]):
@@ -69,7 +90,7 @@ class Evn(object):
 
     def reset(self):
         for i in range(501):
-            self.state.append(i)
+            self.state.append(0)
         path = 'C:/E/dataSet/2018-05-29/hotspot/8点时间段访问hotspot/'
         files = os.listdir(path)
         for file in files:
@@ -77,13 +98,13 @@ class Evn(object):
             self.state.append(sensor + 0.1)
             with open(path + file) as f:
                 for line in f:
-                    data = line.split(',')
+                    data = line.strip().split(',')
                     hotspot = int(data[2])
                     if int(data[3]) == 0:
                         isbelong = 0
                     else:
                         isbelong = 1
-                    self.state.append(sensor + hotspot/100 + isbelong/1000)
+                    self.state.append(round(sensor + hotspot/100 + isbelong/1000, 3))
         self.state.append(0)
         return self.state
 
