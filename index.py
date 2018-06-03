@@ -29,10 +29,10 @@ if __name__ == '__main__':
     # charging_end_time = datetime.strptime('9:00:0', '%H:%M:%S')
     # if charging_end_time > present:
     #     print('a')
-    # sensors_mobile_charger = {}
-    # sensors_mobile_charger['000'] = [0.7, 0.6]
-    # sensors_mobile_charger['001'] = [0.3, 0.8]
-    # sensors_mobile_charger['003'] = [0.9, 1]
+    sensors_mobile_charger = {}
+    sensors_mobile_charger['000'] = [0.7, 0.6]
+    sensors_mobile_charger['001'] = [0.3, 0.8]
+    sensors_mobile_charger['003'] = [0.9, 1]
     # sensors_mobile_charger['004'] = [0.5, 0.5]
     # sensors_mobile_charger['015'] = [0.4, 0.6]
     # sensors_mobile_charger['030'] = [1, 0.9]
@@ -50,11 +50,11 @@ if __name__ == '__main__':
     # sensors_mobile_charger['MC'] = [2000, 50]
     #
     # for key in sensors_mobile_charger:
-    #     if key == '179':
-    #         energy = sensors_mobile_charger[key][0] *  10.8 * 1000
-    #         print(energy)
-    a = 3
-    if a > 0:
-        reword = 1
-
-    print(reword)
+    #     if key == '003':
+    #         sensor = sensors_mobile_charger[key]
+    #         sensor[0] = 100
+    #
+    # for key, value in sensors_mobile_charger.items():
+    #     print(key, value)
+    a = [0,1]
+    print(a[-1])

@@ -95,42 +95,54 @@ class Evn(object):
                     distance_point_hotspot = self.getDistanceBetweenHotspotAndPoint(selected_hotspot, point)
                     if distance_point_hotspot < 60 and present_time <= point.get_time() <= charging_end_time:
                         arrived_sensor.append(sensor_num)
-
-        mc = self.sensors_mobile_charger['MC']
-        mc_reserved_energy = mc[0]
-
+        # 设置返回的奖励值 初始为0
+        reword = 0
         for sensor_num in arrived_sensor:
             for key in self.sensors_mobile_charger:
                 if key == sensor_num:
+                    # 取出sensor
                     sensor = self.sensors_mobile_charger[sensor_num]
+                    # 得到上一次的充电时间
                     previous_charging_time = datetime.strptime(sensor[2], '%H:%M:%S')
-                    sensor_consumption_ratio = data[1]
+                    # 当前sensor 电量消耗的速率
+                    sensor_consumption_ratio = sensor[1]
+                    # 当前sensor 的剩余电量
                     sensor_reserved_energy = sensor[0] - (present_time - previous_charging_time).seconds * sensor[1]
+                    # 当前sensor 的剩余寿命
                     rl = sensor_reserved_energy / sensor_consumption_ratio
+                    # 如果剩余寿命大于两个小时
                     if rl >= 2 * 3600:
-                        reword = 0
-                        break
+                        reword += 0
+                    # 如果剩余寿命在0 到 两个小时
                     elif 0 < rl < 2 * 3600:
-                        mc_reserved_energy = mc_reserved_energy - (10.8 * 1000 - sensor_reserved_energy)
-                        data[1] = 10.8 * 1000
-                        reword = math.exp(-rl)
+                        # mc 充电后的剩余能量
+                        self.sensors_mobile_charger['MC'][0] = self.sensors_mobile_charger['MC'][0] \
+                                                               - (10.8 * 1000 - sensor_reserved_energy)
+                        # 设置sensor 充电后的剩余能量 是满能量
+                        sensor[1] = 10.8 * 1000
+                        # 改变state 的状态
+                        for i in range(501, len(self.state)):
+                            if int(sensor_num) == int(self.state[i]):
+                                self.state[i] = int(self.state[i])
+                        reword += math.exp(-rl)
                     else:
-                        reword = -0.5
-
-        if mc_reserved_energy <= 0:
+                        reword += -0.5
+        # mc 给到达的sensor 充电后，如果能量为负，则回合结束，反之没有结束
+        if self.sensors_mobile_charger['MC'][0] <= 0:
             done = True
         else:
             done = False
 
+        return self.state, reword, done
 
     def reset(self):
         for i in range(501):
             self.state.append(0)
-        path = 'C:/E/dataSet/2018-05-29/hotspot/8点时间段访问hotspot/'
+        path = 'C:/E/dataSet/2018-05-29/hotspot/8时间段访问hotspot/'
         files = os.listdir(path)
         for file in files:
             sensor = int(file.split('.')[0])
-            self.state.append(sensor + 0.1)
+            self.state.append(float(sensor))
             with open(path + file) as f:
                 for line in f:
                     data = line.strip().split(',')
@@ -140,6 +152,7 @@ class Evn(object):
                     else:
                         isbelong = 1
                     self.state.append(round(sensor + hotspot/100 + isbelong/1000, 3))
+        # 添加 mc 移动时间到最后一位
         self.state.append(0)
         return self.state
 
@@ -185,5 +198,14 @@ class Evn(object):
         self.sensors_mobile_charger['179'] = [0.8 * 10.8 * 1000, 0.9, '08:00:00']
         self.sensors_mobile_charger['MC'] = [2000 * 1000, 50]
 
+    def test(self):
+        return 1,3
 
+if __name__ == '__main__':
+    evn = Evn()
+    evn.reset()
+    state_, reword, done = evn.step('2_3')
+    print(state_)
+    print(reword)
+    print(done)
 
