@@ -204,8 +204,6 @@ class Evn(object):
         return 1,3
 
 if __name__ == '__main__':
-    evn = Evn()
-    hotspot = evn.getHotspotFromHotspotsListByNum(1)
-    hotspot2 = evn.getHotspotFromHotspotsListByNum(2)
-    print(evn.getDistanceBetweenHotspots(hotspot, hotspot2))
+    a = 2.235
+    print(round(a, 2))
 
