@@ -203,11 +203,14 @@ class Evn(object):
                 for line in f:
                     # 对每一行进行分割
                     data = line.strip().split(',')
+                    # 获得hotspot 编号
                     hotspot = int(data[2])
+                    # 如果 int(data[3]) == 0，表示没有访问该hotspot，反之，则访问了
                     if int(data[3]) == 0:
                         isbelong = 0
                     else:
                         isbelong = 1
+                    # 添加到state中，形如 1.21，表示1号sensor，没有访问第20号hotspot
                     self.state.append(round(int(sensor) + hotspot/100 + isbelong/1000, 3))
         return self.state
 
