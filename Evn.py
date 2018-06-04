@@ -120,14 +120,16 @@ class Evn(object):
                                                                - (10.8 * 1000 - sensor_reserved_energy)
                         # 设置sensor 充电后的剩余能量 是满能量
                         sensor[1] = 10.8 * 1000
-                        # 改变state 的状态
+                        # 更新上一次被充电的时间
+                        sensor[2] = str(present_time.hour) + ':' + str(present_time.minute) + ':' + str(present_time.second)
+                        # 更新state中 的状态
                         for i in range(501, len(self.state)):
                             if int(sensor_num) == int(self.state[i]):
                                 self.state[i] = int(self.state[i])
                         reword += math.exp(-rl)
                     else:
                         reword += -0.5
-        # mc 给到达的sensor 充电后，如果能量为负，则回合结束，反之没有结束
+        # mc 给到达的sensor 充电后，如果能量为负，则回合结束，反之继续
         if self.sensors_mobile_charger['MC'][0] <= 0:
             done = True
         else:
@@ -138,7 +140,7 @@ class Evn(object):
     def reset(self):
         for i in range(501):
             self.state.append(0)
-        path = 'C:/E/dataSet/2018-05-29/hotspot/8时间段访问hotspot/'
+        path = 'C:/E/dataSet/2018-05-29/sensor/8点时间段访问hotspot/'
         files = os.listdir(path)
         for file in files:
             sensor = int(file.split('.')[0])
